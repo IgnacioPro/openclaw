@@ -79,4 +79,37 @@ describe("chat context notice", () => {
     expect(iconStyle.height).toBe("16px");
     expect(icon.getBoundingClientRect().width).toBeLessThan(24);
   });
+
+  it("uses totalTokens instead of cumulative inputTokens for the context notice", async () => {
+    const container = document.createElement("div");
+    document.body.append(container);
+    render(
+      renderChat(
+        createProps({
+          sessions: {
+            ts: 0,
+            path: "",
+            count: 1,
+            defaults: { model: "gpt-5", contextTokens: null },
+            sessions: [
+              {
+                key: "main",
+                kind: "direct",
+                updatedAt: null,
+                inputTokens: 452_000,
+                totalTokens: 76_000,
+                contextTokens: 256_000,
+              },
+            ],
+          },
+        }),
+      ),
+      container,
+    );
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+
+    expect(container.textContent).not.toContain("100% context used");
+    expect(container.textContent).not.toContain("452k / 256k");
+    expect(container.querySelector(".context-notice")).toBeNull();
+  });
 });
