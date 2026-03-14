@@ -22,6 +22,7 @@ export default defineConfig({
       defineProject({
         test: {
           name: "browser",
+    environment: "jsdom",
           include: ["src/**/*.browser.test.ts"],
           browser: {
             enabled: true,
